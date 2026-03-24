@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  MessageCircle, Menu, X, ArrowRight, ThumbsUp, 
-  Activity, Zap, Smartphone, Globe, TrendingUp, 
+  MessageCircle, Menu, X, ThumbsUp, 
+  Activity, Zap, Smartphone, Globe, 
   CheckCircle, BarChart, Layers, Lock, Mail, Code, 
-  Bot, Send, Download, Settings, Bell, User
+  Bot, Send, Download, Settings, Bell
 } from 'lucide-react';
 
 export default function SocialHubPro() {
@@ -61,7 +61,7 @@ export default function SocialHubPro() {
           msg = `New lead from Maputo: +258 ${numbers[Math.floor(Math.random() * numbers.length)]}`;
           avatar = `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 50)}`;
         } else if (type === 'facebook') {
-          msg = "Ad campaign &apos;Summer&apos; reached 500 impressions.";
+          msg = "Ad campaign 'Summer' reached 500 impressions.";
         } else {
           msg = "System Sync: Node 4 routing nominal.";
         }
@@ -113,16 +113,16 @@ export default function SocialHubPro() {
     setTimeout(() => {
       setCurrentPage(page);
       setIsLoading(false);
-    }, 800); // 0.8s cinematic loading delay
+    }, 800);
   };
 
   const handleExport = () => window.print();
 
-  // Page Variants for Framer Motion
+  // Page Variants for Framer Motion (TypeScript Safe)
   const pageVariants = {
     initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
   };
 
   return (
@@ -265,7 +265,7 @@ export default function SocialHubPro() {
               <p className="text-indigo-400 animate-pulse font-medium text-sm">Fetching secure data...</p>
             </motion.div>
           ) : (
-            <motion.div key={currentPage} variants={pageVariants} initial="initial" animate="animate" exit="exit" className="max-w-7xl mx-auto">
+            <motion.div key={currentPage} variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.4 }} className="max-w-7xl mx-auto">
               
               {/* ---- PAGE: HOME / DASHBOARD ---- */}
               {currentPage === 'home' && (
@@ -299,7 +299,7 @@ export default function SocialHubPro() {
                     </div>
 
                     <AnimatePresence mode="wait">
-                      <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid md:grid-cols-3 gap-6">
+                      <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="grid md:grid-cols-3 gap-6">
                         {activeTab === 'overview' && (
                           <>
                             <motion.div whileHover={{ y: -5 }} className="bg-slate-950/70 p-6 rounded-2xl border border-white/5 border-l-4 border-l-indigo-500 shadow-xl transition-all">
