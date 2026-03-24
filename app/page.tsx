@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { 
   MessageCircle, Menu, X, ArrowRight, ThumbsUp, 
   Activity, Zap, Smartphone, Globe, TrendingUp, 
-  CheckCircle, BarChart3, Layers, Lock, Mail, Github
+  CheckCircle, BarChart, Layers, Lock, Mail, Code
 } from 'lucide-react';
 
 export default function SocialHubPro() {
@@ -167,7 +167,7 @@ export default function SocialHubPro() {
           {currentPage === 'analytics' && (
             <div className="max-w-5xl mx-auto space-y-8">
               <div>
-                <h2 className="text-4xl font-bold mb-4 flex items-center gap-3"><BarChart3 className="text-indigo-500" size={36}/> Deep Analytics Engine</h2>
+                <h2 className="text-4xl font-bold mb-4 flex items-center gap-3"><BarChart className="text-indigo-500" size={36}/> Deep Analytics Engine</h2>
                 <p className="text-slate-400">Real-time metrics compiled by the AI hub.</p>
               </div>
               
@@ -213,7 +213,7 @@ export default function SocialHubPro() {
                 {[
                   { name: 'Facebook Ads', status: 'Connected', color: 'bg-blue-500', icon: <ThumbsUp/> },
                   { name: 'WhatsApp Business', status: 'Connected', color: 'bg-emerald-500', icon: <MessageCircle/> },
-                  { name: 'GitHub Sync', status: 'Connect', color: 'bg-slate-600', icon: <Github/> },
+                  { name: 'System Core Sync', status: 'Connect', color: 'bg-slate-600', icon: <Code/> },
                   { name: 'Mailchimp AI', status: 'Connect', color: 'bg-yellow-500', icon: <Mail/> }
                 ].map((app, i) => (
                   <div key={i} className="bg-slate-900/50 border border-white/10 p-6 rounded-3xl text-center">
