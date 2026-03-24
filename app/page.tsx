@@ -118,7 +118,7 @@ export default function SocialHubPro() {
 
   const handleExport = () => window.print();
 
-  // Page Variants for Framer Motion (TypeScript Safe)
+  // Page Variants for Framer Motion (100% Type Safe)
   const pageVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -361,7 +361,7 @@ export default function SocialHubPro() {
                       <h3 className="text-xl font-bold mb-8 text-slate-300 print:text-black">Audience Growth (30 Days)</h3>
                       <div className="h-48 flex items-end justify-between gap-3 border-b border-l border-white/10 print:border-black pb-2 pl-2">
                         {[30, 45, 25, 60, 75, 50, 90, 100].map((h, i) => (
-                          <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${h}%` }} transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }} className="w-full bg-gradient-to-t from-indigo-600 to-purple-400 rounded-t-md print:bg-black shadow-[0_0_15px_-5px_rgba(99,102,241,0.5)]"></motion.div>
+                          <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${h}%` }} transition={{ duration: 1, delay: i * 0.1 }} className="w-full bg-gradient-to-t from-indigo-600 to-purple-400 rounded-t-md print:bg-black shadow-[0_0_15px_-5px_rgba(99,102,241,0.5)]"></motion.div>
                         ))}
                       </div>
                     </motion.div>
@@ -522,9 +522,9 @@ export default function SocialHubPro() {
                   <div className="flex items-end gap-2">
                     <div className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 mb-1"><Bot size={12}/></div>
                     <div className="bg-slate-800 text-slate-400 p-3.5 rounded-2xl rounded-bl-sm border border-white/5 flex gap-1 shadow-md">
-                      <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="w-1.5 h-1.5 bg-slate-400 rounded-full"></motion.div>
-                      <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-1.5 h-1.5 bg-slate-400 rounded-full"></motion.div>
-                      <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-1.5 h-1.5 bg-slate-400 rounded-full"></motion.div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
                   </div>
                 )}
