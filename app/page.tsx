@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  MessageCircle, Menu, X, ArrowRight, Facebook, 
+  MessageCircle, Menu, X, ArrowRight, ThumbsUp, 
   Activity, Zap, Smartphone, Globe, TrendingUp, CheckCircle 
 } from 'lucide-react';
 
@@ -118,7 +118,7 @@ export default function SocialHubPro() {
                 onClick={() => setActiveTab('facebook')}
                 className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'facebook' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
               >
-                <Facebook size={18} /> Facebook AI
+                <ThumbsUp size={18} /> Facebook AI
               </button>
               <button 
                 onClick={() => setActiveTab('whatsapp')}
@@ -158,7 +158,7 @@ export default function SocialHubPro() {
               {activeTab === 'facebook' && (
                 <>
                   <div className="md:col-span-2 bg-blue-950/20 p-6 rounded-2xl border border-blue-500/20">
-                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-400"><Facebook /> Campaign Performance</h3>
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-400"><ThumbsUp /> Campaign Performance</h3>
                     <div className="h-32 bg-slate-950/50 rounded-xl border border-white/5 flex items-end p-4 gap-2">
                       {/* Fake Bar Chart */}
                       {[40, 70, 45, 90, 65, 100, 85].map((h, i) => (
@@ -186,11 +186,11 @@ export default function SocialHubPro() {
                     <h3 className="text-sm font-bold mb-4 text-slate-400">Live Chat Logs (Simulated)</h3>
                     <div className="space-y-3">
                       <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5 text-sm flex justify-between">
-                        <span className="text-slate-300">"Where is my order?"</span>
+                        <span className="text-slate-300">&quot;Where is my order?&quot;</span>
                         <span className="text-emerald-400 text-xs bg-emerald-500/10 px-2 py-1 rounded">Auto-Resolved</span>
                       </div>
                       <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5 text-sm flex justify-between">
-                        <span className="text-slate-300">"Need speaking to human"</span>
+                        <span className="text-slate-300">&quot;Need speaking to human&quot;</span>
                         <span className="text-amber-400 text-xs bg-amber-500/10 px-2 py-1 rounded">Routing to Team</span>
                       </div>
                     </div>
