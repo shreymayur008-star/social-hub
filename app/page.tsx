@@ -1,10 +1,11 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, Menu, X, ArrowRight, ThumbsUp, 
   Activity, Zap, Smartphone, Globe, TrendingUp, 
-  CheckCircle, BarChart, Layers, Lock, Mail, Code
+  CheckCircle, BarChart, Layers, Lock, Mail, Code, 
+  Bot, Send, Download, Settings, Bell 
 } from 'lucide-react';
 
 export default function SocialHubPro() {
@@ -13,23 +14,88 @@ export default function SocialHubPro() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [activeTab, setActiveTab] = useState<'overview' | 'facebook' | 'whatsapp'>('overview');
   
+  // 1. Live Notification Toasts State
+  const [toasts, setToasts] = useState<{id: number, msg: string}[]>([]);
+  
+  // 2. Interactive Modals State
+  const [activeModal, setActiveModal] = useState<'none' | 'ad' | 'bot'>('none');
+  
+  // 3. AI Chat Assistant State
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{role: 'ai'|'user', text: string}[]>([
+    { role: 'ai', text: 'SocialHub AI online. How can I optimize your workspace today?' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
   // Simulated AI Engine Data
   const [liveMetrics, setLiveMetrics] = useState({
     activeUsers: 12453,
     messagesSent: 892,
+    revenue: 4250,
     aiProcessing: 98.4
   });
 
+  // Data & Toast Simulation Engine
   useEffect(() => {
-    const interval = setInterval(() => {
+    const dataInterval = setInterval(() => {
       setLiveMetrics(prev => ({
         activeUsers: prev.activeUsers + Math.floor(Math.random() * 5),
         messagesSent: prev.messagesSent + Math.floor(Math.random() * 3),
+        revenue: prev.revenue + Math.floor(Math.random() * 15),
         aiProcessing: 98 + Math.random() * 1.9
       }));
     }, 3000);
-    return () => clearInterval(interval);
+
+    const toastMessages = [
+      "New WhatsApp lead from +258 84 555...",
+      "Facebook Ad campaign 'Summer' reached 500 impressions.",
+      "AI resolved 3 customer inquiries automatically.",
+      "System Sync: Node 4 routing nominal."
+    ];
+
+    const toastInterval = setInterval(() => {
+      if (Math.random() > 0.4) {
+        const newToast = {
+          id: Date.now(),
+          msg: toastMessages[Math.floor(Math.random() * toastMessages.length)]
+        };
+        setToasts(prev => [...prev.slice(-2), newToast]); // Keep max 3 toasts
+        setTimeout(() => {
+          setToasts(prev => prev.filter(t => t.id !== newToast.id));
+        }, 5000);
+      }
+    }, 8000);
+
+    return () => {
+      clearInterval(dataInterval);
+      clearInterval(toastInterval);
+    };
   }, []);
+
+  // Auto-scroll chat
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isAiThinking]);
+
+  // Handle AI Chat Submission
+  const handleChatSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    
+    setChatMessages(prev => [...prev, { role: 'user', text: chatInput }]);
+    setChatInput('');
+    setIsAiThinking(true);
+
+    setTimeout(() => {
+      setIsAiThinking(false);
+      setChatMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: 'Analyzing request... Based on current metrics, I recommend reallocating 15% of your ad budget to WhatsApp direct engagement for a projected 8% ROI increase.' 
+      }]);
+    }, 2000);
+  };
 
   // Universal Navigation Handler
   const navigateTo = (page: 'home' | 'analytics' | 'integrations' | 'pricing' | 'login') => {
@@ -38,15 +104,91 @@ export default function SocialHubPro() {
     window.scrollTo(0, 0);
   };
 
+  // Export PDF Handler
+  const handleExport = () => {
+    window.print();
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-50 font-sans overflow-hidden selection:bg-indigo-500/30">
       
       {/* Universal Background */}
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none print:hidden" />
+      <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none print:hidden" />
+
+      {/* --- LIVE NOTIFICATION TOASTS --- */}
+      <div className="fixed top-24 right-4 z-50 flex flex-col gap-2 print:hidden">
+        <AnimatePresence>
+          {toasts.map(toast => (
+            <motion.div 
+              key={toast.id}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              className="bg-slate-900/90 backdrop-blur-md border border-indigo-500/30 p-4 rounded-xl shadow-lg flex items-center gap-3 w-80"
+            >
+              <Bell size={18} className="text-indigo-400 flex-shrink-0" />
+              <p className="text-xs text-slate-200">{toast.msg}</p>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* --- INTERACTIVE MODALS --- */}
+      <AnimatePresence>
+        {activeModal !== 'none' && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 print:hidden"
+          >
+            <motion.div 
+              initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              className="bg-slate-900 border border-white/10 p-6 rounded-3xl w-full max-w-md shadow-2xl relative"
+            >
+              <button onClick={() => setActiveModal('none')} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X size={20}/></button>
+              
+              {activeModal === 'ad' ? (
+                <>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><ThumbsUp className="text-blue-500"/> Configure Auto-Ad</h3>
+                  <div className="space-y-4 mb-6">
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Daily Budget ($)</label>
+                      <input type="range" min="5" max="100" defaultValue="25" className="w-full accent-blue-500" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Target Audience AI</label>
+                      <select className="w-full bg-slate-950 border border-white/10 rounded-lg p-3 text-sm focus:outline-none">
+                        <option>Lookalike (High Conversion)</option>
+                        <option>Retargeting (Warm Leads)</option>
+                        <option>Broad (Brand Awareness)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button onClick={() => { setActiveModal('none'); setToasts(prev => [...prev, {id: Date.now(), msg: "Ad Campaign Deployed Successfully!"}]); }} className="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-bold transition-colors">Deploy to Facebook</button>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Smartphone className="text-emerald-500"/> Bot Config</h3>
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-white/5">
+                      <span className="text-sm font-medium">Auto-resolve FAQs</span>
+                      <div className="w-10 h-6 bg-emerald-500 rounded-full relative cursor-pointer"><div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div></div>
+                    </div>
+                    <div className="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-white/5">
+                      <span className="text-sm font-medium">Human Handoff Alert</span>
+                      <div className="w-10 h-6 bg-emerald-500 rounded-full relative cursor-pointer"><div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1"></div></div>
+                    </div>
+                  </div>
+                  <button onClick={() => { setActiveModal('none'); setToasts(prev => [...prev, {id: Date.now(), msg: "Bot Protocols Updated!"}]); }} className="w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-bold transition-colors">Save Configuration</button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Navigation Bar */}
-      <nav className="fixed w-full bg-slate-950/80 backdrop-blur-xl z-50 border-b border-white/10">
+      <nav className="fixed w-full bg-slate-950/80 backdrop-blur-xl z-50 border-b border-white/10 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <button onClick={() => navigateTo('home')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
@@ -78,7 +220,7 @@ export default function SocialHubPro() {
         </div>
       </nav>
 
-      {/* Main Content Area - Swaps based on state */}
+      {/* Main Content Area */}
       <main className="pt-32 pb-20 px-4 relative z-10 min-h-[80vh]">
         <motion.div 
           key={currentPage}
@@ -91,7 +233,7 @@ export default function SocialHubPro() {
           {/* ---- PAGE: HOME / DASHBOARD ---- */}
           {currentPage === 'home' && (
             <div className="space-y-24">
-              <div className="text-center">
+              <div className="text-center print:hidden">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-medium mb-8">
                   <Activity size={16} className="animate-pulse" /> Live AI Data Sync Active
                 </div>
@@ -104,14 +246,11 @@ export default function SocialHubPro() {
                 <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
                   Integrate Facebook and WhatsApp into a single, intelligent terminal. Automate responses, track live engagement, and grow faster.
                 </p>
-                <button onClick={() => navigateTo('pricing')} className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all flex items-center justify-center gap-2 mx-auto shadow-[0_0_30px_-5px_rgba(99,102,241,0.5)]">
-                  Initialize Workspace <ArrowRight size={20} />
-                </button>
               </div>
 
               {/* Interactive Toggles inside Home */}
               <div className="max-w-5xl mx-auto bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
-                <div className="flex flex-wrap gap-2 mb-8 bg-slate-950/50 p-2 rounded-2xl border border-white/5 inline-flex">
+                <div className="flex flex-wrap gap-2 mb-8 bg-slate-950/50 p-2 rounded-2xl border border-white/5 inline-flex print:hidden">
                   <button onClick={() => setActiveTab('overview')} className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'overview' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
                     <Globe size={18} /> Global
                   </button>
@@ -130,9 +269,9 @@ export default function SocialHubPro() {
                         <p className="text-slate-400 text-sm mb-1">Total Network Reach</p>
                         <p className="text-4xl font-bold font-mono">{liveMetrics.activeUsers.toLocaleString()}</p>
                       </div>
-                      <div className="bg-slate-950/50 p-6 rounded-2xl border border-white/5 border-l-4 border-l-purple-500">
-                        <p className="text-slate-400 text-sm mb-1">Messages Processed</p>
-                        <p className="text-4xl font-bold font-mono">{liveMetrics.messagesSent.toLocaleString()}</p>
+                      <div className="bg-slate-950/50 p-6 rounded-2xl border border-white/5 border-l-4 border-l-emerald-500">
+                        <p className="text-slate-400 text-sm mb-1">Est. Revenue Generated</p>
+                        <p className="text-4xl font-bold font-mono text-emerald-400">${liveMetrics.revenue.toLocaleString()}</p>
                       </div>
                       <div className="bg-slate-950/50 p-6 rounded-2xl border border-white/5 border-l-4 border-l-pink-500">
                         <p className="text-slate-400 text-sm mb-1">System Health</p>
@@ -141,21 +280,24 @@ export default function SocialHubPro() {
                     </>
                   )}
                   {activeTab === 'facebook' && (
-                    <div className="md:col-span-3 bg-blue-950/20 p-6 rounded-2xl border border-blue-500/20 flex justify-between items-center">
+                    <div className="md:col-span-3 bg-blue-950/20 p-6 rounded-2xl border border-blue-500/20 flex flex-col md:flex-row justify-between items-center gap-4">
                       <div>
-                        <h3 className="text-xl font-bold text-blue-400">Campaign Performance</h3>
-                        <p className="text-slate-400 text-sm mt-2">AI predicts 24% higher conversion on next deployment.</p>
+                        <h3 className="text-xl font-bold text-blue-400 mb-2">Campaign Performance</h3>
+                        <div className="flex gap-4">
+                          <div className="bg-blue-900/30 p-3 rounded-lg"><span className="text-xs text-blue-300 block">Active Ads</span><span className="font-bold">12</span></div>
+                          <div className="bg-blue-900/30 p-3 rounded-lg"><span className="text-xs text-blue-300 block">Avg. CPC</span><span className="font-bold">$0.42</span></div>
+                        </div>
                       </div>
-                      <button onClick={() => navigateTo('analytics')} className="py-3 px-6 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition-colors">View Deep Analytics</button>
+                      <button onClick={() => setActiveModal('ad')} className="w-full md:w-auto py-3 px-6 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition-colors flex items-center gap-2"><Settings size={18}/> Launch Auto-Ad</button>
                     </div>
                   )}
                   {activeTab === 'whatsapp' && (
-                    <div className="md:col-span-3 bg-emerald-950/20 p-6 rounded-2xl border border-emerald-500/20 flex justify-between items-center">
+                    <div className="md:col-span-3 bg-emerald-950/20 p-6 rounded-2xl border border-emerald-500/20 flex flex-col md:flex-row justify-between items-center gap-4">
                       <div>
-                        <h3 className="text-xl font-bold text-emerald-400">Active Bot Sessions: 42/50</h3>
-                        <p className="text-slate-400 text-sm mt-2">All routing protocols functioning nominally.</p>
+                        <h3 className="text-xl font-bold text-emerald-400 mb-2">Active Bot Sessions: 42/50</h3>
+                        <p className="text-emerald-200/70 text-sm max-w-sm">AI is currently handling routing for 8 active customer disputes automatically.</p>
                       </div>
-                      <button onClick={() => navigateTo('integrations')} className="py-3 px-6 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold transition-colors">Manage Bot Config</button>
+                      <button onClick={() => setActiveModal('bot')} className="w-full md:w-auto py-3 px-6 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold transition-colors flex items-center gap-2"><Settings size={18}/> Manage Config</button>
                     </div>
                   )}
                 </div>
@@ -163,38 +305,43 @@ export default function SocialHubPro() {
             </div>
           )}
 
-          {/* ---- PAGE: ANALYTICS ---- */}
+          {/* ---- PAGE: ANALYTICS (With Export feature) ---- */}
           {currentPage === 'analytics' && (
-            <div className="max-w-5xl mx-auto space-y-8">
-              <div>
-                <h2 className="text-4xl font-bold mb-4 flex items-center gap-3"><BarChart className="text-indigo-500" size={36}/> Deep Analytics Engine</h2>
-                <p className="text-slate-400">Real-time metrics compiled by the AI hub.</p>
+            <div className="max-w-5xl mx-auto space-y-8 print:m-0 print:p-0">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h2 className="text-4xl font-bold mb-2 flex items-center gap-3"><BarChart className="text-indigo-500" size={36}/> Deep Analytics Engine</h2>
+                  <p className="text-slate-400">Executive performance overview.</p>
+                </div>
+                <button onClick={handleExport} className="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 border border-white/10 print:hidden">
+                  <Download size={18}/> Export PDF Report
+                </button>
               </div>
               
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-slate-900/50 border border-white/10 p-6 rounded-3xl">
-                  <h3 className="text-xl font-bold mb-6 text-slate-300">Audience Growth (30 Days)</h3>
-                  <div className="h-48 flex items-end justify-between gap-2 border-b border-l border-white/10 pb-2 pl-2">
+                <div className="bg-slate-900/50 border border-white/10 p-6 rounded-3xl print:border-black/20 print:bg-white print:text-black">
+                  <h3 className="text-xl font-bold mb-6 text-slate-300 print:text-black">Audience Growth (30 Days)</h3>
+                  <div className="h-48 flex items-end justify-between gap-2 border-b border-l border-white/10 print:border-black pb-2 pl-2">
                     {[30, 45, 25, 60, 75, 50, 90, 100].map((h, i) => (
-                      <div key={i} className="w-full bg-gradient-to-t from-indigo-600 to-purple-400 rounded-t-sm" style={{ height: `${h}%` }}></div>
+                      <div key={i} className="w-full bg-gradient-to-t from-indigo-600 to-purple-400 rounded-t-sm print:bg-black" style={{ height: `${h}%` }}></div>
                     ))}
                   </div>
                 </div>
                 
-                <div className="bg-slate-900/50 border border-white/10 p-6 rounded-3xl">
-                  <h3 className="text-xl font-bold mb-6 text-slate-300">Traffic Sources</h3>
+                <div className="bg-slate-900/50 border border-white/10 p-6 rounded-3xl print:border-black/20 print:bg-white print:text-black">
+                  <h3 className="text-xl font-bold mb-6 text-slate-300 print:text-black">Sales Conversion Pipeline</h3>
                   <div className="space-y-4">
                     <div>
-                      <div className="flex justify-between text-sm mb-1"><span className="text-blue-400">Facebook</span><span>65%</span></div>
-                      <div className="w-full bg-slate-800 rounded-full h-2"><div className="bg-blue-500 h-2 rounded-full" style={{width: '65%'}}></div></div>
+                      <div className="flex justify-between text-sm mb-1"><span className="text-slate-400 print:text-black">Total Leads</span><span className="font-bold">2,450</span></div>
+                      <div className="w-full bg-slate-800 rounded-full h-2"><div className="bg-indigo-500 h-2 rounded-full print:bg-black" style={{width: '100%'}}></div></div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1"><span className="text-emerald-400">WhatsApp Shares</span><span>25%</span></div>
-                      <div className="w-full bg-slate-800 rounded-full h-2"><div className="bg-emerald-500 h-2 rounded-full" style={{width: '25%'}}></div></div>
+                      <div className="flex justify-between text-sm mb-1"><span className="text-slate-400 print:text-black">Engaged (WhatsApp)</span><span className="font-bold">1,102</span></div>
+                      <div className="w-full bg-slate-800 rounded-full h-2"><div className="bg-purple-500 h-2 rounded-full print:bg-black" style={{width: '65%'}}></div></div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1"><span className="text-pink-400">Organic Direct</span><span>10%</span></div>
-                      <div className="w-full bg-slate-800 rounded-full h-2"><div className="bg-pink-500 h-2 rounded-full" style={{width: '10%'}}></div></div>
+                      <div className="flex justify-between text-sm mb-1"><span className="text-slate-400 print:text-black">Converted to Sale</span><span className="font-bold text-emerald-400 print:text-black">315</span></div>
+                      <div className="w-full bg-slate-800 rounded-full h-2"><div className="bg-emerald-500 h-2 rounded-full print:bg-black" style={{width: '25%'}}></div></div>
                     </div>
                   </div>
                 </div>
@@ -294,15 +441,52 @@ export default function SocialHubPro() {
         </motion.div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-12 px-4 bg-slate-950 relative z-10">
-        <div className="max-w-7xl mx-auto flex justify-center items-center">
-          <div className="flex items-center gap-2 opacity-50">
-            <Zap size={16} />
-            <span className="text-sm">SocialHub.AI Prototype</span>
-          </div>
-        </div>
-      </footer>
+      {/* --- FLOATING AI ASSISTANT TERMINAL --- */}
+      <div className="fixed bottom-6 right-6 z-50 print:hidden">
+        <AnimatePresence>
+          {isChatOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.9 }}
+              className="absolute bottom-16 right-0 w-80 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            >
+              <div className="bg-indigo-600 p-4 flex justify-between items-center">
+                <div className="flex items-center gap-2"><Bot size={20}/> <span className="font-bold">Hub AI Assistant</span></div>
+                <button onClick={() => setIsChatOpen(false)}><X size={18} className="text-indigo-200 hover:text-white"/></button>
+              </div>
+              <div className="h-64 overflow-y-auto p-4 space-y-4 bg-slate-950/50">
+                {chatMessages.map((msg, idx) => (
+                  <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`p-3 rounded-xl max-w-[85%] text-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 rounded-bl-none'}`}>
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+                {isAiThinking && (
+                  <div className="flex justify-start">
+                    <div className="bg-slate-800 text-slate-400 p-3 rounded-xl rounded-bl-none flex gap-1">
+                      <span className="animate-bounce">.</span><span className="animate-bounce" style={{animationDelay: '0.2s'}}>.</span><span className="animate-bounce" style={{animationDelay: '0.4s'}}>.</span>
+                    </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+              <form onSubmit={handleChatSubmit} className="p-3 bg-slate-900 border-t border-white/10 flex gap-2">
+                <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} type="text" placeholder="Ask AI to analyze data..." className="flex-1 bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
+                <button type="submit" disabled={isAiThinking} className="bg-indigo-600 p-2 rounded-lg text-white hover:bg-indigo-500 disabled:opacity-50"><Send size={18}/></button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <button 
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className={`p-4 rounded-full shadow-2xl transition-all ${isChatOpen ? 'bg-slate-800 text-white border border-white/10' : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_20px_-5px_rgba(99,102,241,0.5)]'}`}
+        >
+          {isChatOpen ? <X size={24}/> : <MessageCircle size={24}/>}
+        </button>
+      </div>
     </div>
   );
 }
