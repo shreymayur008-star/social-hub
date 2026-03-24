@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Users, BarChart3, MessageCircle, Share2, CheckCircle2, 
-  Menu, X, ArrowRight, Facebook, Activity, Zap, Smartphone, Globe, TrendingUp
+  MessageCircle, Menu, X, ArrowRight, Facebook, 
+  Activity, Zap, Smartphone, Globe, TrendingUp, CheckCircle 
 } from 'lucide-react';
 
 export default function SocialHubPro() {
@@ -234,7 +234,7 @@ export default function SocialHubPro() {
             <ul className="text-left space-y-4 mb-8">
               {['Unlimited API Requests', 'Live Database Sync', 'WhatsApp Business Bot', 'Facebook Graph Access'].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-slate-300">
-                  <CheckCircle2 className="text-indigo-400 w-5 h-5 flex-shrink-0" />
+                  <CheckCircle className="text-indigo-400 w-5 h-5 flex-shrink-0" />
                   <span>{item}</span>
                 </li>
               ))}
